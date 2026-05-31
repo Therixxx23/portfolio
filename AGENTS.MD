@@ -179,17 +179,17 @@ Buat file `.env.local` berdasarkan `.env.example`:
 
 ```env
 # GitHub API
-GITHUB_USERNAME=Therixxx23
-GITHUB_TOKEN=
+GITHUB_USERNAME=your_github_username
+GITHUB_TOKEN=ghp_YOUR_TOKEN_HERE
 
 # EmailJS
-NEXT_PUBLIC_EMAILJS_SERVICE_ID=
-NEXT_PUBLIC_EMAILJS_TEMPLATE_ID=
-NEXT_PUBLIC_EMAILJS_PUBLIC_KEY=
+NEXT_PUBLIC_EMAILJS_SERVICE_ID=service_xxxxx
+NEXT_PUBLIC_EMAILJS_TEMPLATE_ID=template_xxxxx
+NEXT_PUBLIC_EMAILJS_PUBLIC_KEY=xxxxxxxxxxxxx
 
 # Admin Auth
 ADMIN_USERNAME=admin
-ADMIN_PASSWORD=admin321
+ADMIN_PASSWORD=your_secure_password_here
 NEXTAUTH_SECRET=your_nextauth_secret_32chars
 NEXTAUTH_URL=http://localhost:3000
 
@@ -198,7 +198,7 @@ NEXT_PUBLIC_SUPABASE_URL=https://xxxx.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJxxxxxxxx
 
 # Email tujuan form contact
-CONTACT_EMAIL=rifqiariqf@gmail.com
+CONTACT_EMAIL=youremail@gmail.com
 ```
 
 > ⚠️ **JANGAN** commit `.env.local` ke GitHub. Sudah ada di `.gitignore`.
@@ -224,7 +224,7 @@ export const experiences = [
     id: 2,
     company: "Bandeng Presto Cianjur",
     role: "Graphic Designer (Instagram)",
-    period: "2025 – 2026",
+    period: "2021 – 2022",
     description: "Mengelola konten visual Instagram brand, membuat desain feed, stories, dan promosi menggunakan Canva.",
     type: "work"
   }
@@ -299,7 +299,7 @@ export const skills = {
 
 ```bash
 # Clone repo
-git clone https://github.com/Therixxx23/portfolio.git
+git clone https://github.com/USERNAME/portfolio.git
 cd portfolio
 
 # Install dependencies
