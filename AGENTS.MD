@@ -180,7 +180,7 @@ Buat file `.env.local` berdasarkan `.env.example`:
 ```env
 # GitHub API
 GITHUB_USERNAME=Therixxx23
-GITHUB_TOKEN=github_pat_
+GITHUB_TOKEN=
 
 # EmailJS
 NEXT_PUBLIC_EMAILJS_SERVICE_ID=
