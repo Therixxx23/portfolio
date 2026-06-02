@@ -18,7 +18,7 @@
 
     <nav class="navbar" role="navigation" aria-label="Main navigation">
         <a href="/" class="nav-link" style="font-size: 1.25rem; text-transform: none; letter-spacing: 0;">RA</a>
-        <div style="display: flex; gap: 2rem; align-items: center;">
+        <div class="nav-desktop" style="display: flex; gap: 2rem; align-items: center;">
             <a href="/" class="nav-link active">Home</a>
             <a href="/projects" class="nav-link">Projects</a>
             <a href="/skills" class="nav-link">Skills</a>
@@ -26,7 +26,23 @@
             <a href="/github" class="nav-link">GitHub</a>
             <a href="/connect" class="nav-link">Connect</a>
         </div>
+        <button class="hamburger" id="hamburgerBtn" aria-label="Toggle navigation menu" aria-expanded="false">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
     </nav>
+
+    <div class="mobile-overlay" id="mobileOverlay" role="dialog" aria-modal="true" aria-label="Navigation menu">
+        <div class="mobile-menu">
+            <a href="/" class="mobile-link">Home</a>
+            <a href="/projects" class="mobile-link">Projects</a>
+            <a href="/skills" class="mobile-link">Skills</a>
+            <a href="/play" class="mobile-link">Play</a>
+            <a href="/github" class="mobile-link">GitHub</a>
+            <a href="/connect" class="mobile-link">Connect</a>
+        </div>
+    </div>
 
     <main>
         @yield('content')

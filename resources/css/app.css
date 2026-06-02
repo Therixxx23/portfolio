@@ -417,6 +417,113 @@ textarea.form-input {
     background-clip: text;
 }
 
+.hamburger {
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 40px;
+    height: 40px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 8px;
+    z-index: 200;
+    position: relative;
+}
+
+.hamburger span {
+    display: block;
+    width: 24px;
+    height: 2px;
+    background: #F0F4FF;
+    border-radius: 2px;
+    transition: all 0.3s ease;
+    position: absolute;
+    left: 8px;
+}
+
+.hamburger span:nth-child(1) { top: 12px; }
+.hamburger span:nth-child(2) { top: 19px; }
+.hamburger span:nth-child(3) { top: 26px; }
+
+.hamburger.open span:nth-child(1) {
+    top: 19px;
+    transform: rotate(45deg);
+}
+
+.hamburger.open span:nth-child(2) {
+    opacity: 0;
+    transform: scaleX(0);
+}
+
+.hamburger.open span:nth-child(3) {
+    top: 19px;
+    transform: rotate(-45deg);
+}
+
+.mobile-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 150;
+    background: rgba(8, 12, 20, 0.85);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.mobile-overlay.open {
+    opacity: 1;
+}
+
+.mobile-menu {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: min(320px, 80vw);
+    height: 100vh;
+    background: rgba(20, 25, 38, 0.97);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border-left: 1px solid rgba(255, 255, 255, 0.08);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 5rem 2rem;
+    transform: translateX(100%);
+    transition: transform 0.35s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.mobile-overlay.open .mobile-menu {
+    transform: translateX(0);
+}
+
+.mobile-link {
+    font-family: 'Syne', sans-serif;
+    font-weight: 600;
+    font-size: 1.25rem;
+    color: #8B9CBD;
+    text-decoration: none;
+    padding: 0.75rem 1rem;
+    border-radius: 0.5rem;
+    transition: all 0.2s ease;
+    display: block;
+}
+
+.mobile-link:hover,
+.mobile-link.active {
+    color: #00D4FF;
+    background: rgba(0, 212, 255, 0.05);
+}
+
+@media (max-width: 767px) {
+    .nav-desktop { display: none !important; }
+    .hamburger { display: flex; }
+}
+
 @media (prefers-reduced-motion: reduce) {
     .liquid-blob { animation: none; }
     .intro-overlay { transition-duration: 0.01ms; }

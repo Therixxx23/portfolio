@@ -27,15 +27,60 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     const navLinks = document.querySelectorAll('.nav-link');
+    const mobileLinks = document.querySelectorAll('.mobile-link');
     const currentPath = window.location.pathname;
-    navLinks.forEach(function (link) {
-        link.classList.remove('active');
-        var href = link.getAttribute('href');
-        if (href === currentPath || (href !== '/' && currentPath.startsWith(href))) {
-            link.classList.add('active');
+
+    function setActiveLink(links) {
+        links.forEach(function (link) {
+            link.classList.remove('active');
+            var href = link.getAttribute('href');
+            if (href === currentPath || (href !== '/' && currentPath.startsWith(href))) {
+                link.classList.add('active');
+            }
+            if (currentPath === '/' && href === '/') {
+                link.classList.add('active');
+            }
+        });
+    }
+
+    setActiveLink(navLinks);
+    setActiveLink(mobileLinks);
+
+    const hamburger = document.getElementById('hamburgerBtn');
+    const overlay = document.getElementById('mobileOverlay');
+
+    if (hamburger && overlay) {
+        function openMenu() {
+            hamburger.classList.add('open');
+            hamburger.setAttribute('aria-expanded', 'true');
+            overlay.classList.add('open');
+            document.body.style.overflow = 'hidden';
         }
-        if (currentPath === '/' && href === '/') {
-            link.classList.add('active');
+
+        function closeMenu() {
+            hamburger.classList.remove('open');
+            hamburger.setAttribute('aria-expanded', 'false');
+            overlay.classList.remove('open');
+            document.body.style.overflow = '';
         }
-    });
+
+        hamburger.addEventListener('click', function () {
+            var isOpen = overlay.classList.contains('open');
+            if (isOpen) {
+                closeMenu();
+            } else {
+                openMenu();
+            }
+        });
+
+        overlay.addEventListener('click', function (e) {
+            if (e.target === overlay) {
+                closeMenu();
+            }
+        });
+
+        mobileLinks.forEach(function (link) {
+            link.addEventListener('click', closeMenu);
+        });
+    }
 });
