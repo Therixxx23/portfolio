@@ -144,6 +144,14 @@
                     from_email: email,
                     message: message,
                     to_email: contactEmail || email,
+                    time: new Date().toLocaleString('id-ID', {
+                        weekday: 'long',
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    }),
                 }).then(function () {
                     feedback.textContent = 'Message sent successfully! I\'ll get back to you soon.';
                     feedback.style.display = 'block';
