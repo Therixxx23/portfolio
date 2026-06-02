@@ -463,7 +463,6 @@ textarea.form-input {
 }
 
 .mobile-overlay {
-    display: none;
     position: fixed;
     inset: 0;
     z-index: 150;
@@ -471,17 +470,22 @@ textarea.form-input {
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
     opacity: 0;
-    transition: opacity 0.3s ease;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
 }
 
 .mobile-overlay.open {
     opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
 }
 
 .mobile-menu {
     position: fixed;
     top: 0;
     right: 0;
+    z-index: 1;
     width: min(320px, 80vw);
     height: 100vh;
     background: rgba(20, 25, 38, 0.97);
