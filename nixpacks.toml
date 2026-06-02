@@ -1,0 +1,23 @@
+[php]
+version = "8.4"
+extensions = [
+  "bcmath",
+  "ctype",
+  "curl",
+  "fileinfo",
+  "gd",
+  "intl",
+  "mbstring",
+  "openssl",
+  "pdo",
+  "pdo_sqlite",
+  "tokenizer",
+  "xml",
+  "zip"
+]
+
+[node]
+version = "20"
+
+[start]
+cmd = "php artisan serve --host=0.0.0.0 --port=${PORT:-8080}"
