@@ -15,11 +15,11 @@
     <div class="glass-card" style="padding:1.5rem;margin-bottom:2rem;">
         <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
             <a href="{{ route('admin.dashboard') }}" class="btn-ghost" style="font-size:0.8rem;padding:0.5rem 1rem;">Dashboard</a>
-            <a href="#" class="btn-ghost" style="font-size:0.8rem;padding:0.5rem 1rem;">Profile</a>
-            <a href="#" class="btn-ghost" style="font-size:0.8rem;padding:0.5rem 1rem;">Experience</a>
-            <a href="{{ route('admin.educations.index') }}" class="btn-primary" style="font-size:0.8rem;padding:0.5rem 1rem;">Education</a>
-            <a href="{{ route('admin.projects.index') }}" class="btn-ghost" style="font-size:0.8rem;padding:0.5rem 1rem;">Projects</a>
-            <a href="{{ route('admin.games.index') }}" class="btn-ghost" style="font-size:0.8rem;padding:0.5rem 1rem;">Games</a>
+            <a href="{{ route('admin.profile') }}" class="btn-ghost" style="font-size:0.8rem;padding:0.5rem 1rem;">Profile</a>
+            <a href="{{ route('admin.experiences') }}" class="btn-ghost" style="font-size:0.8rem;padding:0.5rem 1rem;">Experience</a>
+            <a href="{{ route('admin.educations') }}" class="btn-primary" style="font-size:0.8rem;padding:0.5rem 1rem;">Education</a>
+            <a href="{{ route('admin.projects') }}" class="btn-ghost" style="font-size:0.8rem;padding:0.5rem 1rem;">Projects</a>
+            <a href="{{ route('admin.games') }}" class="btn-ghost" style="font-size:0.8rem;padding:0.5rem 1rem;">Games</a>
         </div>
     </div>
 
