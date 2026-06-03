@@ -34,20 +34,41 @@
         <form method="POST" action="{{ route('admin.games.save', $game ?? '') }}" enctype="multipart/form-data">
             @csrf
             <div style="margin-bottom:1.25rem;">
-                <label for="title" style="display:block;font-size:0.8rem;color:#8B9CBD;margin-bottom:0.4rem;">Title</label>
+                <label for="title" style="display:block;font-size:0.8rem;color:#8B9CBD;margin-bottom:0.4rem;">Title <span style="color:#FF4466;">*</span></label>
                 <input type="text" id="title" name="title" class="form-input" value="{{ old('title', $game->title ?? '') }}" required>
-                <p style="color:#4A5568;font-size:0.75rem;margin-top:0.3rem;">The game path will be auto-generated from the title.</p>
             </div>
+
+            <div style="margin-bottom:1.25rem;">
+                <label for="slug" style="display:block;font-size:0.8rem;color:#8B9CBD;margin-bottom:0.4rem;">Slug</label>
+                <input type="text" id="slug" name="slug" class="form-input" value="{{ old('slug', $game->slug ?? '') }}" placeholder="Auto-generated from title if empty">
+                <p style="color:#4A5568;font-size:0.75rem;margin-top:0.3rem;">URL-friendly name. Leave empty to auto-generate from title.</p>
+            </div>
+
             <div style="margin-bottom:1.25rem;">
                 <label for="description" style="display:block;font-size:0.8rem;color:#8B9CBD;margin-bottom:0.4rem;">Description</label>
-                <textarea id="description" name="description" class="form-input">{{ old('description', $game->description ?? '') }}</textarea>
+                <textarea id="description" name="description" class="form-input" rows="3">{{ old('description', $game->description ?? '') }}</textarea>
             </div>
+
             <div style="margin-bottom:1.25rem;">
-                <label for="category" style="display:block;font-size:0.8rem;color:#8B9CBD;margin-bottom:0.4rem;">Category</label>
-                <input type="text" id="category" name="category" class="form-input" value="{{ old('category', $game->category ?? 'unity') }}" required>
+                <label for="category" style="display:block;font-size:0.8rem;color:#8B9CBD;margin-bottom:0.4rem;">Category <span style="color:#FF4466;">*</span></label>
+                <select id="category" name="category" class="form-input" required>
+                    <option value="unity" {{ (old('category', $game->category ?? '') == 'unity') ? 'selected' : '' }}>Unity</option>
+                    <option value="web" {{ (old('category', $game->category ?? '') == 'web') ? 'selected' : '' }}>Web</option>
+                    <option value="godot" {{ (old('category', $game->category ?? '') == 'godot') ? 'selected' : '' }}>Godot</option>
+                    <option value="other" {{ (old('category', $game->category ?? '') == 'other') ? 'selected' : '' }}>Other</option>
+                </select>
             </div>
-            <div style="margin-bottom:1.5rem;">
-                <label for="thumbnail" style="display:block;font-size:0.8rem;color:#8B9CBD;margin-bottom:0.4rem;">Thumbnail</label>
+
+            <div style="margin-bottom:1.25rem;">
+                <label for="status" style="display:block;font-size:0.8rem;color:#8B9CBD;margin-bottom:0.4rem;">Status</label>
+                <select id="status" name="status" class="form-input">
+                    <option value="published" {{ (old('status', $game->status ?? '') == 'published') ? 'selected' : '' }}>Published</option>
+                    <option value="draft" {{ (old('status', $game->status ?? '') == 'draft') ? 'selected' : '' }}>Draft</option>
+                </select>
+            </div>
+
+            <div style="margin-bottom:1.25rem;">
+                <label for="thumbnail" style="display:block;font-size:0.8rem;color:#8B9CBD;margin-bottom:0.4rem;">Thumbnail Image</label>
                 @if (isset($game) && $game->thumbnail)
                     <div style="margin-bottom:0.75rem;">
                         <img src="{{ Storage::url($game->thumbnail) }}" alt="Current thumbnail" style="max-width:200px;max-height:120px;border-radius:0.5rem;border:1px solid rgba(255,255,255,0.08);">
@@ -55,8 +76,18 @@
                 @endif
                 <input type="file" id="thumbnail" name="thumbnail" class="form-input" style="padding:0.5rem;" accept="image/*">
             </div>
+
+            <div style="margin-bottom:1.5rem;">
+                <label for="build_zip" style="display:block;font-size:0.8rem;color:#8B9CBD;margin-bottom:0.4rem;">Unity WebGL Build (ZIP)</label>
+                @if (isset($game))
+                    <p style="color:#8B9CBD;font-size:0.8rem;margin-bottom:0.5rem;">Current path: <span style="font-family:'JetBrains Mono',monospace;color:#4A5568;">{{ $game->path }}</span></p>
+                @endif
+                <input type="file" id="build_zip" name="build_zip" class="form-input" style="padding:0.5rem;" accept=".zip">
+                <p style="color:#4A5568;font-size:0.75rem;margin-top:0.3rem;">Upload a ZIP file containing your Unity WebGL build. Must include <span style="font-family:'JetBrains Mono',monospace;">index.html</span> at the root. Max 50MB.</p>
+            </div>
+
             <div style="display:flex;gap:0.75rem;">
-                <button type="submit" class="btn-primary">Save</button>
+                <button type="submit" class="btn-primary" style="cursor:pointer;">Save</button>
                 <a href="{{ route('admin.games') }}" class="btn-ghost">Cancel</a>
             </div>
         </form>

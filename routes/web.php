@@ -12,7 +12,8 @@ Route::get('/', [HomeController::class, 'index']);
 
 Route::get('/projects', [ProjectsController::class, 'index']);
 Route::view('/skills', 'skills');
-Route::get('/play', [PlayController::class, 'index']);
+Route::get('/play', [PlayController::class, 'index'])->name('play.index');
+Route::get('/play/{game}', [PlayController::class, 'show'])->name('play.show');
 Route::get('/github', [GitHubController::class, 'index']);
 Route::view('/connect', 'connect');
 

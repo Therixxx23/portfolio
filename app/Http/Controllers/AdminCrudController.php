@@ -9,6 +9,8 @@ use App\Models\Game;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Symfony\Component\Process\Process;
+use Symfony\Component\Process\Exception\ProcessFailedException;
 
 class AdminCrudController extends Controller
 {
@@ -180,23 +182,48 @@ class AdminCrudController extends Controller
 
     public function saveGame(Request $request, ?Game $game = null)
     {
-        $data = $request->validate([
+        $slug = $request->slug
+            ?? ($game?->slug ?? Str::slug($request->title));
+
+        $rules = [
             'title'       => 'required',
+            'slug'        => 'nullable|unique:games,slug,' . ($game?->id ?? 'NULL') . ',id',
             'description' => 'nullable',
             'category'    => 'required',
+            'status'      => 'nullable|in:published,draft',
             'thumbnail'   => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
-        ]);
+            'build_zip'   => $game ? 'nullable|file|mimes:zip|max:51200' : 'nullable|file|mimes:zip|max:51200',
+        ];
+
+        $data = $request->validate($rules);
 
         if ($request->hasFile('thumbnail')) {
             $data['thumbnail'] = $request->file('thumbnail')->store('games', 'public');
         }
 
-        $data['path'] = '/games/' . Str::slug($data['title']) . '/index.html';
+        $data['slug'] = $slug;
+        $data['path'] = '/games/' . $slug . '/index.html';
+
+        if (!isset($data['status'])) {
+            $data['status'] = $game?->status ?? 'published';
+        }
 
         if ($game) {
             $game->update($data);
         } else {
-            Game::create($data);
+            $game = Game::create($data);
+        }
+
+        if ($request->hasFile('build_zip')) {
+            $zip = $request->file('build_zip');
+            $extractPath = public_path('games/' . $game->slug);
+            $zipPath = $zip->getPathname();
+
+            if (!is_dir($extractPath)) {
+                mkdir($extractPath, 0755, true);
+            }
+
+            $this->extractZip($zipPath, $extractPath);
         }
 
         return redirect()->route('admin.games')->with('success', 'Game saved successfully.');
@@ -208,7 +235,36 @@ class AdminCrudController extends Controller
             Storage::disk('public')->delete($game->thumbnail);
         }
 
+        $gamePath = public_path('games/' . $game->slug);
+        if (is_dir($gamePath)) {
+            $this->rmdirRecursive($gamePath);
+        }
+
         $game->delete();
         return redirect()->back()->with('success', 'Game deleted successfully.');
+    }
+
+    private function extractZip(string $zipPath, string $destination): void
+    {
+        $zipPath = str_replace('/', '\\', $zipPath);
+        $destination = str_replace('/', '\\', $destination);
+        $command = "powershell -Command \"Expand-Archive -Path '$zipPath' -DestinationPath '$destination' -Force\"";
+        exec($command . ' 2>&1', $output, $exitCode);
+        if ($exitCode !== 0) {
+            throw new \RuntimeException('ZIP extraction failed: ' . implode("\n", $output));
+        }
+    }
+
+    private function rmdirRecursive(string $dir): void
+    {
+        if (!is_dir($dir)) {
+            return;
+        }
+        $items = array_diff(scandir($dir), ['.', '..']);
+        foreach ($items as $item) {
+            $path = $dir . DIRECTORY_SEPARATOR . $item;
+            is_dir($path) ? $this->rmdirRecursive($path) : unlink($path);
+        }
+        rmdir($dir);
     }
 }

@@ -33,8 +33,9 @@
                 <thead>
                     <tr style="color:#8B9CBD;text-transform:uppercase;letter-spacing:0.05em;font-size:0.75rem;border-bottom:1px solid rgba(255,255,255,0.08);">
                         <th style="padding:0.75rem 1rem;text-align:left;">Title</th>
+                        <th style="padding:0.75rem 1rem;text-align:left;">Slug</th>
                         <th style="padding:0.75rem 1rem;text-align:left;">Category</th>
-                        <th style="padding:0.75rem 1rem;text-align:left;">Path</th>
+                        <th style="padding:0.75rem 1rem;text-align:left;">Status</th>
                         <th style="padding:0.75rem 1rem;text-align:left;">Thumbnail</th>
                         <th style="padding:0.75rem 1rem;text-align:right;">Actions</th>
                     </tr>
@@ -42,9 +43,16 @@
                 <tbody>
                     @foreach ($games as $game)
                         <tr style="border-bottom:1px solid rgba(255,255,255,0.04);transition:background 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.02)'" onmouseout="this.style.background='transparent'">
-                            <td style="padding:1rem;color:#F0F4FF;">{{ $game->title }}</td>
+                            <td style="padding:1rem;color:#F0F4FF;font-weight:500;">{{ $game->title }}</td>
+                            <td style="padding:1rem;color:#8B9CBD;font-family:'JetBrains Mono',monospace;font-size:0.8rem;">{{ $game->slug }}</td>
                             <td style="padding:1rem;color:#8B9CBD;text-transform:capitalize;">{{ $game->category }}</td>
-                            <td style="padding:1rem;color:#8B9CBD;font-family:'JetBrains Mono',monospace;font-size:0.8rem;">{{ $game->path }}</td>
+                            <td style="padding:1rem;">
+                                @if ($game->status === 'published')
+                                    <span style="font-size:0.75rem;background:rgba(0,255,179,0.1);color:#00FFB3;padding:0.2rem 0.6rem;border-radius:0.25rem;">Published</span>
+                                @else
+                                    <span style="font-size:0.75rem;background:rgba(255,255,255,0.06);color:#8B9CBD;padding:0.2rem 0.6rem;border-radius:0.25rem;">Draft</span>
+                                @endif
+                            </td>
                             <td style="padding:1rem;">
                                 @if ($game->thumbnail)
                                     <img src="{{ Storage::url($game->thumbnail) }}" alt="{{ $game->title }}" style="width:60px;height:40px;object-fit:cover;border-radius:0.375rem;border:1px solid rgba(255,255,255,0.08);">
