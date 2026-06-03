@@ -2,6 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Experience;
+use App\Models\Education;
+use App\Models\Project;
+use App\Models\Game;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
 
@@ -37,8 +41,10 @@ class AdminController extends Controller
     public function dashboard()
     {
         return view('admin.dashboard', [
-            'projectCount' => 2,
-            'gameCount' => 1,
+            'projectCount' => Project::count(),
+            'gameCount' => Game::count(),
+            'experienceCount' => Experience::count(),
+            'educationCount' => Education::count(),
         ]);
     }
 
@@ -47,5 +53,22 @@ class AdminController extends Controller
         Session::forget('admin_authenticated');
         Session::forget('admin_username');
         return redirect()->route('admin.login');
+    }
+
+    public function profile()
+    {
+        return view('admin.profile');
+    }
+
+    public function uploadPhoto(Request $request)
+    {
+        $request->validate([
+            'photo' => 'required|image|mimes:jpeg,png,jpg,webp|max:2048',
+        ]);
+
+        $path = $request->file('photo')->store('profile', 'public');
+        session(['profile_photo' => $path]);
+
+        return back()->with('success', 'Profile photo updated.');
     }
 }

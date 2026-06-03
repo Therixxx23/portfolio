@@ -15,56 +15,37 @@
         <button class="filter-btn" data-filter="web" style="background: rgba(255,255,255,0.04); color: #8B9CBD; border: 1px solid rgba(255,255,255,0.08); padding: 0.5rem 1.25rem; border-radius: 2rem; font-family: 'DM Sans', sans-serif; font-size: 0.875rem; cursor: pointer; transition: all 0.3s ease;">Web</button>
     </div>
 
-    @php
-        $projects = [
-            [
-                'title' => 'Personal Portfolio',
-                'desc' => 'Portfolio website interaktif dengan Liquid Glass design system, dibangun dengan Laravel + Tailwind CSS.',
-                'tags' => ['Laravel', 'Tailwind CSS', 'JavaScript'],
-                'category' => 'web',
-                'image' => null,
-                'demo' => '#',
-                'repo' => '#',
-            ],
-            [
-                'title' => 'Unity Game Project',
-                'desc' => 'Game 2D/3D dikembangkan dengan Unity Engine, mencakup mekanik gameplay dan optimasi performa.',
-                'tags' => ['Unity', 'C#'],
-                'category' => 'unity',
-                'image' => null,
-                'demo' => '/play',
-                'repo' => '#',
-            ],
-        ];
-    @endphp
-
     <div id="projectGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 1.5rem;">
-        @foreach ($projects as $project)
-            <div class="project-card" data-category="{{ $project['category'] }}">
+        @forelse ($projects as $project)
+            <div class="project-card" data-category="{{ $project->category }}">
                 <div class="project-card-image">
-                    @if ($project['image'])
-                        <img src="{{ $project['image'] }}" alt="{{ $project['title'] }}" style="width:100%;height:100%;object-fit:cover;">
+                    @if ($project->thumbnail)
+                        <img src="{{ Storage::url($project->thumbnail) }}" alt="{{ $project->title }}" style="width:100%;height:100%;object-fit:cover;">
                     @else
                         <div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#00D4FF10,#0066FF10);">
-                            <span style="font-family:'Syne',sans-serif;font-weight:800;font-size:2rem;color:#00D4FF30;">{{ substr($project['title'], 0, 2) }}</span>
+                            <span style="font-family:'Syne',sans-serif;font-weight:800;font-size:2rem;color:#00D4FF30;">{{ substr($project->title, 0, 2) }}</span>
                         </div>
                     @endif
                 </div>
                 <div style="padding: 1.5rem;">
-                    <h3 style="font-family:'Syne',sans-serif;font-weight:600;font-size:1.25rem;color:#F0F4FF;margin-bottom:0.5rem;">{{ $project['title'] }}</h3>
-                    <p style="font-size:0.875rem;color:#8B9CBD;margin-bottom:1rem;">{{ $project['desc'] }}</p>
+                    <h3 style="font-family:'Syne',sans-serif;font-weight:600;font-size:1.25rem;color:#F0F4FF;margin-bottom:0.5rem;">{{ $project->title }}</h3>
+                    <p style="font-size:0.875rem;color:#8B9CBD;margin-bottom:1rem;">{{ $project->description }}</p>
                     <div style="display:flex;flex-wrap:wrap;gap:0.5rem;margin-bottom:1rem;">
-                        @foreach ($project['tags'] as $tag)
+                        @foreach ($project->tech_stack as $tag)
                             <span style="font-family:'JetBrains Mono',monospace;font-size:0.7rem;padding:0.25rem 0.6rem;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:0.25rem;color:#8B9CBD;">{{ $tag }}</span>
                         @endforeach
                     </div>
                     <div style="display:flex;gap:0.75rem;">
-                        <a href="{{ $project['demo'] }}" class="btn-primary" style="font-size:0.8rem;padding:0.5rem 1rem;">Demo</a>
-                        <a href="{{ $project['repo'] }}" class="btn-ghost" style="font-size:0.8rem;padding:0.5rem 1rem;">Repo</a>
+                        <a href="{{ $project->demo_url }}" class="btn-primary" style="font-size:0.8rem;padding:0.5rem 1rem;">Demo</a>
+                        <a href="{{ $project->repo_url }}" class="btn-ghost" style="font-size:0.8rem;padding:0.5rem 1rem;">Repo</a>
                     </div>
                 </div>
             </div>
-        @endforeach
+        @empty
+            <div class="glass-card" style="padding:3rem;text-align:center;grid-column:1/-1;">
+                <p style="color:#4A5568;font-family:'JetBrains Mono',monospace;">No projects yet.</p>
+            </div>
+        @endforelse
     </div>
 </section>
 

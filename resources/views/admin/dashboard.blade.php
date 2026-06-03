@@ -15,7 +15,18 @@
         </form>
     </div>
 
-    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1rem;margin-bottom:3rem;">
+    <div class="glass-card" style="padding:1.25rem;margin-bottom:2.5rem;">
+        <div style="display:flex;flex-wrap:wrap;gap:0.75rem;justify-content:center;">
+            <a href="{{ route('admin.dashboard') }}" class="nav-link" style="background:rgba(0,212,255,0.1);border:1px solid rgba(0,212,255,0.3);color:#00D4FF;padding:0.6rem 1.25rem;border-radius:0.5rem;text-decoration:none;font-size:0.85rem;font-weight:500;">Dashboard</a>
+            <a href="{{ route('admin.profile') }}" class="nav-link" style="padding:0.6rem 1.25rem;border-radius:0.5rem;text-decoration:none;font-size:0.85rem;font-weight:400;color:#8B9CBD;border:1px solid transparent;transition:all 0.2s;" onmouseover="this.style.borderColor='rgba(255,255,255,0.15)';this.style.color='#F0F4FF'" onmouseout="this.style.borderColor='transparent';this.style.color='#8B9CBD'">Profile</a>
+            <a href="{{ route('admin.experiences') }}" class="nav-link" style="padding:0.6rem 1.25rem;border-radius:0.5rem;text-decoration:none;font-size:0.85rem;font-weight:400;color:#8B9CBD;border:1px solid transparent;transition:all 0.2s;" onmouseover="this.style.borderColor='rgba(255,255,255,0.15)';this.style.color='#F0F4FF'" onmouseout="this.style.borderColor='transparent';this.style.color='#8B9CBD'">Experience</a>
+            <a href="{{ route('admin.educations') }}" class="nav-link" style="padding:0.6rem 1.25rem;border-radius:0.5rem;text-decoration:none;font-size:0.85rem;font-weight:400;color:#8B9CBD;border:1px solid transparent;transition:all 0.2s;" onmouseover="this.style.borderColor='rgba(255,255,255,0.15)';this.style.color='#F0F4FF'" onmouseout="this.style.borderColor='transparent';this.style.color='#8B9CBD'">Education</a>
+            <a href="{{ route('admin.projects') }}" class="nav-link" style="padding:0.6rem 1.25rem;border-radius:0.5rem;text-decoration:none;font-size:0.85rem;font-weight:400;color:#8B9CBD;border:1px solid transparent;transition:all 0.2s;" onmouseover="this.style.borderColor='rgba(255,255,255,0.15)';this.style.color='#F0F4FF'" onmouseout="this.style.borderColor='transparent';this.style.color='#8B9CBD'">Projects</a>
+            <a href="{{ route('admin.games') }}" class="nav-link" style="padding:0.6rem 1.25rem;border-radius:0.5rem;text-decoration:none;font-size:0.85rem;font-weight:400;color:#8B9CBD;border:1px solid transparent;transition:all 0.2s;" onmouseover="this.style.borderColor='rgba(255,255,255,0.15)';this.style.color='#F0F4FF'" onmouseout="this.style.borderColor='transparent';this.style.color='#8B9CBD'">Games</a>
+        </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem;margin-bottom:3rem;">
         <div class="stat-card">
             <span class="stat-value">{{ $projectCount ?? 0 }}</span>
             <span class="stat-label">Projects</span>
@@ -24,14 +35,14 @@
             <span class="stat-value">{{ $gameCount ?? 0 }}</span>
             <span class="stat-label">Games</span>
         </div>
-    </div>
-
-    <div class="glass-card animate-on-scroll" style="padding:2rem;text-align:center;">
-        <div style="font-size:2rem;margin-bottom:1rem;">
-            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#00D4FF" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+        <div class="stat-card">
+            <span class="stat-value">{{ $experienceCount ?? 0 }}</span>
+            <span class="stat-label">Experiences</span>
         </div>
-        <p style="color:#4A5568;font-family:'JetBrains Mono',monospace;font-size:0.875rem;margin-bottom:0.5rem;">Project & Game management coming soon.</p>
-        <p style="color:#4A5568;font-size:0.8rem;">CRUD forms will be added in the next iteration.</p>
+        <div class="stat-card">
+            <span class="stat-value">{{ $educationCount ?? 0 }}</span>
+            <span class="stat-label">Educations</span>
+        </div>
     </div>
 </section>
 
