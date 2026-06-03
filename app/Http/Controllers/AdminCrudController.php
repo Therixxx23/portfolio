@@ -9,8 +9,7 @@ use App\Models\Game;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
-use Symfony\Component\Process\Process;
-use Symfony\Component\Process\Exception\ProcessFailedException;
+use Illuminate\Support\Facades\Log;
 
 class AdminCrudController extends Controller
 {
@@ -182,76 +181,124 @@ class AdminCrudController extends Controller
 
     public function saveGame(Request $request, ?Game $game = null)
     {
-        $slug = $request->slug
-            ?? ($game?->slug ?? Str::slug($request->title));
+        try {
+            $slug = $request->slug
+                ?? ($game?->slug ?? Str::slug($request->title));
 
-        $rules = [
-            'title'       => 'required',
-            'slug'        => 'nullable|unique:games,slug,' . ($game?->id ?? 'NULL') . ',id',
-            'description' => 'nullable',
-            'category'    => 'required',
-            'status'      => 'nullable|in:published,draft',
-            'thumbnail'   => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
-            'build_zip'   => $game ? 'nullable|file|mimes:zip|max:51200' : 'nullable|file|mimes:zip|max:51200',
-        ];
-
-        $data = $request->validate($rules);
-
-        if ($request->hasFile('thumbnail')) {
-            $data['thumbnail'] = $request->file('thumbnail')->store('games', 'public');
-        }
-
-        $data['slug'] = $slug;
-        $data['path'] = '/games/' . $slug . '/index.html';
-
-        if (!isset($data['status'])) {
-            $data['status'] = $game?->status ?? 'published';
-        }
-
-        if ($game) {
-            $game->update($data);
-        } else {
-            $game = Game::create($data);
-        }
-
-        if ($request->hasFile('build_zip')) {
-            $zip = $request->file('build_zip');
-            $extractPath = public_path('games/' . $game->slug);
-            $zipPath = $zip->getPathname();
-
-            if (!is_dir($extractPath)) {
-                mkdir($extractPath, 0755, true);
+            if (!preg_match('/^[a-z0-9\-]+$/', $slug)) {
+                return back()->withErrors(['slug' => 'Invalid slug format. Use only lowercase letters, numbers, and hyphens.'])->withInput();
             }
 
-            $this->extractZip($zipPath, $extractPath);
-        }
+            $existingSlug = Game::where('slug', $slug)->where('id', '!=', $game?->id ?? 0)->first();
+            if ($existingSlug) {
+                return back()->withErrors(['slug' => 'A game with this slug already exists. Please choose a different title or slug.'])->withInput();
+            }
 
-        return redirect()->route('admin.games')->with('success', 'Game saved successfully.');
+            $rules = [
+                'title'       => 'required|string|max:255',
+                'description' => 'nullable|string',
+                'category'    => 'required|string|max:50',
+                'status'      => 'nullable|in:published,draft',
+                'thumbnail'   => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
+                'build_zip'   => 'nullable|file|mimes:zip|max:51200',
+            ];
+
+            $data = $request->validate($rules);
+
+            if ($request->hasFile('thumbnail')) {
+                $data['thumbnail'] = $request->file('thumbnail')->store('games', 'public');
+            }
+
+            $data['slug'] = $slug;
+            $data['path'] = '/games/' . $slug . '/index.html';
+
+            if (!isset($data['status'])) {
+                $data['status'] = $game?->status ?? 'published';
+            }
+
+            if ($game) {
+                $game->update($data);
+            } else {
+                $game = Game::create($data);
+            }
+
+            if ($request->hasFile('build_zip')) {
+                $zipPath = $request->file('build_zip')->getPathname();
+                $extractPath = public_path('games/' . $game->slug);
+                $this->extractZip($zipPath, $extractPath);
+
+                if (!file_exists($extractPath . '/index.html')) {
+                    $this->rmdirRecursive($extractPath);
+                    return back()->withErrors(['build_zip' => 'The ZIP file must contain an index.html at its root. Upload a valid Unity WebGL build.'])->withInput();
+                }
+            }
+
+            return redirect()->route('admin.games')->with('success', 'Game saved successfully.');
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            throw $e;
+        } catch (\Exception $e) {
+            Log::error('Game save failed', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+            return back()->withErrors(['error' => 'Failed to save game: ' . $e->getMessage()])->withInput();
+        }
     }
 
     public function deleteGame(Game $game)
     {
-        if ($game->thumbnail && Storage::disk('public')->exists($game->thumbnail)) {
-            Storage::disk('public')->delete($game->thumbnail);
-        }
+        try {
+            if ($game->thumbnail && Storage::disk('public')->exists($game->thumbnail)) {
+                Storage::disk('public')->delete($game->thumbnail);
+            }
 
-        $gamePath = public_path('games/' . $game->slug);
-        if (is_dir($gamePath)) {
-            $this->rmdirRecursive($gamePath);
-        }
+            $gamePath = public_path('games/' . $game->slug);
+            if (is_dir($gamePath)) {
+                $this->rmdirRecursive($gamePath);
+            }
 
-        $game->delete();
-        return redirect()->back()->with('success', 'Game deleted successfully.');
+            $game->delete();
+            return redirect()->back()->with('success', 'Game deleted successfully.');
+        } catch (\Exception $e) {
+            Log::error('Game delete failed', ['error' => $e->getMessage()]);
+            return back()->withErrors(['error' => 'Failed to delete game: ' . $e->getMessage()]);
+        }
     }
 
     private function extractZip(string $zipPath, string $destination): void
     {
-        $zipPath = str_replace('/', '\\', $zipPath);
-        $destination = str_replace('/', '\\', $destination);
-        $command = "powershell -Command \"Expand-Archive -Path '$zipPath' -DestinationPath '$destination' -Force\"";
-        exec($command . ' 2>&1', $output, $exitCode);
-        if ($exitCode !== 0) {
-            throw new \RuntimeException('ZIP extraction failed: ' . implode("\n", $output));
+        if (!is_dir($destination)) {
+            if (!mkdir($destination, 0755, true) && !is_dir($destination)) {
+                throw new \RuntimeException('Failed to create extraction directory: ' . $destination);
+            }
+        }
+
+        if (class_exists('ZipArchive')) {
+            $zip = new \ZipArchive();
+            $res = $zip->open($zipPath);
+            if ($res !== true) {
+                throw new \RuntimeException('Failed to open ZIP file (code: ' . $res . ')');
+            }
+            if (!$zip->extractTo($destination)) {
+                $zip->close();
+                throw new \RuntimeException('Failed to extract ZIP file.');
+            }
+            $zip->close();
+        } elseif (class_exists('PharData')) {
+            try {
+                $phar = new \PharData($zipPath);
+                $phar->extractTo($destination, null, true);
+            } catch (\Exception $e) {
+                throw new \RuntimeException('PharData extraction failed: ' . $e->getMessage());
+            }
+        } else {
+            $escapedZip = str_replace("'", "''", $zipPath);
+            $escapedDest = str_replace("'", "''", $destination);
+            $command = "powershell -Command \"Expand-Archive -Path '$escapedZip' -DestinationPath '$escapedDest' -Force\"";
+            exec($command . ' 2>&1', $output, $exitCode);
+            if ($exitCode !== 0) {
+                throw new \RuntimeException('ZIP extraction failed: ' . implode("\n", $output));
+            }
         }
     }
 
