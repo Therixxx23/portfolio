@@ -33,44 +33,82 @@
     <div class="glass-card" style="padding:2rem;max-width:640px;">
         <form method="POST" action="{{ route('admin.projects.save', $project ?? '') }}" enctype="multipart/form-data">
             @csrf
+
+            {{-- Common Fields (shown for all categories) --}}
             <div style="margin-bottom:1.25rem;">
                 <label for="title" style="display:block;font-size:0.8rem;color:#8B9CBD;margin-bottom:0.4rem;">Title <span style="color:#FF4466;">*</span></label>
                 <input type="text" id="title" name="title" class="form-input" value="{{ old('title', $project->title ?? '') }}" required>
             </div>
+
             <div style="margin-bottom:1.25rem;">
                 <label for="description" style="display:block;font-size:0.8rem;color:#8B9CBD;margin-bottom:0.4rem;">Description</label>
-                <textarea id="description" name="description" class="form-input">{{ old('description', $project->description ?? '') }}</textarea>
+                <textarea id="description" name="description" class="form-input" rows="4">{{ old('description', $project->description ?? '') }}</textarea>
             </div>
-            <div style="margin-bottom:1.25rem;">
+
+            <div style="margin-bottom:1.5rem;">
                 <label for="category" style="display:block;font-size:0.8rem;color:#8B9CBD;margin-bottom:0.4rem;">Category <span style="color:#FF4466;">*</span></label>
-                <select id="category" name="category" class="form-input" required>
+                <select id="category" name="category" class="form-input" required onchange="toggleFields(this.value)">
                     <option value="unity" {{ (old('category', $project->category ?? '') == 'unity') ? 'selected' : '' }}>Unity Game</option>
                     <option value="web" {{ (old('category', $project->category ?? '') == 'web') ? 'selected' : '' }}>Web</option>
                     <option value="design" {{ (old('category', $project->category ?? '') == 'design') ? 'selected' : '' }}>Design</option>
                 </select>
             </div>
-            <div style="margin-bottom:1.25rem;">
-                <label for="tech_stack" style="display:block;font-size:0.8rem;color:#8B9CBD;margin-bottom:0.4rem;">Tech Stack</label>
-                <input type="text" id="tech_stack" name="tech_stack" class="form-input" value="{{ old('tech_stack', is_array($project->tech_stack ?? null) ? implode(', ', $project->tech_stack) : ($project->tech_stack ?? '') ) }}" placeholder="Laravel, Tailwind, JavaScript">
-                <p style="color:#4A5568;font-size:0.75rem;margin-top:0.3rem;">Comma-separated, e.g. Laravel, Tailwind, JavaScript</p>
+
+            {{-- Unity Game Fields --}}
+            <div class="game-fields" style="margin-bottom:1.25rem;">
+                <div style="margin-bottom:1.25rem;">
+                    <label for="external_link" style="display:block;font-size:0.8rem;color:#8B9CBD;margin-bottom:0.4rem;">External Link (itch.io / Demo URL)</label>
+                    <input type="url" id="external_link" name="external_link" class="form-input" value="{{ old('external_link', $project->external_link ?? '') }}" placeholder="https://itch.io/...">
+                </div>
+                <div style="margin-bottom:1.25rem;">
+                    <label for="link_label" style="display:block;font-size:0.8rem;color:#8B9CBD;margin-bottom:0.4rem;">Link Label</label>
+                    <input type="text" id="link_label" name="link_label" class="form-input" value="{{ old('link_label', $project->link_label ?? '') }}" placeholder="Play on itch.io">
+                </div>
             </div>
-            <div style="margin-bottom:1.25rem;">
-                <label for="demo_url" style="display:block;font-size:0.8rem;color:#8B9CBD;margin-bottom:0.4rem;">Demo URL</label>
-                <input type="url" id="demo_url" name="demo_url" class="form-input" value="{{ old('demo_url', $project->demo_url ?? '') }}" placeholder="https://">
+
+            {{-- Web Fields --}}
+            <div class="web-fields" style="margin-bottom:1.25rem;">
+                <div style="margin-bottom:1.25rem;">
+                    <label for="demo_url" style="display:block;font-size:0.8rem;color:#8B9CBD;margin-bottom:0.4rem;">Demo URL</label>
+                    <input type="url" id="demo_url" name="demo_url" class="form-input" value="{{ old('demo_url', $project->demo_url ?? '') }}" placeholder="https://">
+                </div>
+                <div style="margin-bottom:1.25rem;">
+                    <label for="repo_url" style="display:block;font-size:0.8rem;color:#8B9CBD;margin-bottom:0.4rem;">Repo URL (GitHub)</label>
+                    <input type="url" id="repo_url" name="repo_url" class="form-input" value="{{ old('repo_url', $project->repo_url ?? '') }}" placeholder="https://github.com/...">
+                </div>
+                <div style="margin-bottom:1.25rem;">
+                    <label for="tech_stack" style="display:block;font-size:0.8rem;color:#8B9CBD;margin-bottom:0.4rem;">Tech Stack Tags</label>
+                    <input type="text" id="tech_stack" name="tech_stack" class="form-input" value="{{ old('tech_stack', is_array($project->tech_stack ?? null) ? implode(', ', $project->tech_stack) : ($project->tech_stack ?? '') ) }}" placeholder="Laravel, Tailwind, JavaScript">
+                    <p style="color:#4A5568;font-size:0.75rem;margin-top:0.3rem;">Comma-separated, e.g. Laravel, Tailwind, JavaScript</p>
+                </div>
             </div>
-            <div style="margin-bottom:1.25rem;">
-                <label for="repo_url" style="display:block;font-size:0.8rem;color:#8B9CBD;margin-bottom:0.4rem;">Repository URL</label>
-                <input type="url" id="repo_url" name="repo_url" class="form-input" value="{{ old('repo_url', $project->repo_url ?? '') }}" placeholder="https://">
+
+            {{-- Design Fields --}}
+            <div class="design-fields" style="margin-bottom:1.25rem;">
+                <div style="margin-bottom:1.25rem;">
+                    <label for="client_brand" style="display:block;font-size:0.8rem;color:#8B9CBD;margin-bottom:0.4rem;">Client / Brand Name</label>
+                    <input type="text" id="client_brand" name="client_brand" class="form-input" value="{{ old('client_brand', $project->client_brand ?? '') }}" placeholder="e.g. Bandeng Presto Cianjur">
+                </div>
+                <div style="margin-bottom:1.25rem;">
+                    <label for="instagram_link" style="display:block;font-size:0.8rem;color:#8B9CBD;margin-bottom:0.4rem;">Instagram Link</label>
+                    <input type="url" id="instagram_link" name="instagram_link" class="form-input" value="{{ old('instagram_link', $project->instagram_link ?? '') }}" placeholder="https://instagram.com/p/...">
+                    <p style="color:#4A5568;font-size:0.75rem;margin-top:0.3rem;">Optional link to the Instagram post.</p>
+                </div>
+                <div style="margin-bottom:1.25rem;">
+                    <label style="display:block;font-size:0.8rem;color:#8B9CBD;margin-bottom:0.4rem;">Image Gallery (max 6 images)</label>
+                    @if (isset($project) && is_array($project->image_gallery) && count($project->image_gallery) > 0)
+                        <div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:0.75rem;">
+                            @foreach ($project->image_gallery as $img)
+                                <img src="{{ Storage::url($img) }}" alt="" style="width:80px;height:60px;object-fit:cover;border-radius:0.375rem;border:1px solid rgba(255,255,255,0.08);">
+                            @endforeach
+                        </div>
+                    @endif
+                    <input type="file" id="image_gallery" name="image_gallery[]" class="form-input" style="padding:0.5rem;" accept="image/*" multiple>
+                    <p style="color:#4A5568;font-size:0.75rem;margin-top:0.3rem;">Upload up to 6 images for the design portfolio collage.</p>
+                </div>
             </div>
-            <div style="margin-bottom:1.25rem;">
-                <label for="external_link" style="display:block;font-size:0.8rem;color:#8B9CBD;margin-bottom:0.4rem;">External Link</label>
-                <input type="url" id="external_link" name="external_link" class="form-input" value="{{ old('external_link', $project->external_link ?? '') }}" placeholder="https://instagram.com/p/...">
-                <p style="color:#4A5568;font-size:0.75rem;margin-top:0.3rem;">Instagram post link or any external URL for design projects.</p>
-            </div>
-            <div style="margin-bottom:1.25rem;">
-                <label for="link_label" style="display:block;font-size:0.8rem;color:#8B9CBD;margin-bottom:0.4rem;">Link Label</label>
-                <input type="text" id="link_label" name="link_label" class="form-input" value="{{ old('link_label', $project->link_label ?? '') }}" placeholder="View on Instagram">
-            </div>
+
+            {{-- Thumbnail + Status (shown for all categories) --}}
             <div style="margin-bottom:1.25rem;">
                 <label for="thumbnail" style="display:block;font-size:0.8rem;color:#8B9CBD;margin-bottom:0.4rem;">Thumbnail</label>
                 @if (isset($project) && $project->thumbnail)
@@ -80,18 +118,15 @@
                 @endif
                 <input type="file" id="thumbnail" name="thumbnail" class="form-input" style="padding:0.5rem;" accept="image/*">
             </div>
+
             <div style="margin-bottom:1.5rem;">
-                <label for="image_gallery" style="display:block;font-size:0.8rem;color:#8B9CBD;margin-bottom:0.4rem;">Image Gallery (for Design projects)</label>
-                @if (isset($project) && $project->image_gallery)
-                    <div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:0.75rem;">
-                        @foreach ($project->image_gallery as $img)
-                            <img src="{{ Storage::url($img) }}" alt="" style="width:80px;height:60px;object-fit:cover;border-radius:0.375rem;border:1px solid rgba(255,255,255,0.08);">
-                        @endforeach
-                    </div>
-                @endif
-                <input type="file" id="image_gallery" name="image_gallery[]" class="form-input" style="padding:0.5rem;" accept="image/*" multiple>
-                <p style="color:#4A5568;font-size:0.75rem;margin-top:0.3rem;">Upload multiple images for a collage/gallery. Works best with Design category.</p>
+                <label for="status" style="display:block;font-size:0.8rem;color:#8B9CBD;margin-bottom:0.4rem;">Status</label>
+                <select id="status" name="status" class="form-input">
+                    <option value="published" {{ (old('status', $project->status ?? 'published') == 'published') ? 'selected' : '' }}>Published</option>
+                    <option value="draft" {{ (old('status', $project->status ?? 'published') == 'draft') ? 'selected' : '' }}>Draft</option>
+                </select>
             </div>
+
             <div style="display:flex;gap:0.75rem;">
                 <button type="submit" class="btn-primary">Save</button>
                 <a href="{{ route('admin.projects') }}" class="btn-ghost">Cancel</a>
@@ -100,3 +135,24 @@
     </div>
 </section>
 @endsection
+
+@push('scripts')
+<script>
+function toggleFields(category) {
+    document.querySelectorAll('.game-fields, .web-fields, .design-fields').forEach(function(el) {
+        el.style.display = 'none';
+    });
+    if (category === 'unity') {
+        document.querySelector('.game-fields').style.display = 'block';
+    } else if (category === 'web') {
+        document.querySelector('.web-fields').style.display = 'block';
+    } else if (category === 'design') {
+        document.querySelector('.design-fields').style.display = 'block';
+    }
+}
+document.addEventListener('DOMContentLoaded', function() {
+    var cat = document.getElementById('category');
+    if (cat) toggleFields(cat.value);
+});
+</script>
+@endpush

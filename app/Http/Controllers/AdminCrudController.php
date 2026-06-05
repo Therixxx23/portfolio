@@ -131,8 +131,11 @@ class AdminCrudController extends Controller
             'repo_url'      => 'nullable|url',
             'external_link' => 'nullable|url|max:1000',
             'link_label'    => 'nullable|string|max:255',
+            'instagram_link'=> 'nullable|url|max:1000',
+            'client_brand'  => 'nullable|string|max:255',
+            'status'        => 'nullable|in:published,draft',
             'thumbnail'     => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
-            'image_gallery' => 'nullable|array',
+            'image_gallery' => 'nullable|array|max:6',
             'image_gallery.*' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
         ]);
 
@@ -153,6 +156,8 @@ class AdminCrudController extends Controller
         if (isset($data['tech_stack']) && is_string($data['tech_stack'])) {
             $data['tech_stack'] = array_map('trim', explode(',', $data['tech_stack']));
         }
+
+        $data['status'] = $data['status'] ?? 'published';
 
         if ($project) {
             $project->update($data);
