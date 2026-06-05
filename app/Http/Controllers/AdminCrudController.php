@@ -182,18 +182,6 @@ class AdminCrudController extends Controller
     public function saveGame(Request $request, ?Game $game = null)
     {
         try {
-            $slug = $request->slug
-                ?? ($game?->slug ?? Str::slug($request->title));
-
-            if (!preg_match('/^[a-z0-9\-]+$/', $slug)) {
-                return back()->withErrors(['slug' => 'Invalid slug format. Use only lowercase letters, numbers, and hyphens.'])->withInput();
-            }
-
-            $existingSlug = Game::where('slug', $slug)->where('id', '!=', $game?->id ?? 0)->first();
-            if ($existingSlug) {
-                return back()->withErrors(['slug' => 'A game with this slug already exists. Please choose a different title or slug.'])->withInput();
-            }
-
             $rules = [
                 'title'       => 'required|string|max:255',
                 'description' => 'nullable|string',
@@ -204,6 +192,22 @@ class AdminCrudController extends Controller
             ];
 
             $data = $request->validate($rules);
+
+            if (!$game && empty($data['title'])) {
+                return back()->withErrors(['title' => 'Title is required.'])->withInput();
+            }
+
+            $slug = $request->slug
+                ?? ($game?->slug ?? Str::slug($data['title']));
+
+            if (empty($slug) || !preg_match('/^[a-z0-9\-]+$/', $slug)) {
+                return back()->withErrors(['slug' => 'Invalid slug format. Use only lowercase letters, numbers, and hyphens.'])->withInput();
+            }
+
+            $existingSlug = Game::where('slug', $slug)->where('id', '!=', $game?->id ?? 0)->first();
+            if ($existingSlug) {
+                return back()->withErrors(['slug' => 'A game with this slug already exists. Please choose a different title or slug.'])->withInput();
+            }
 
             if ($request->hasFile('thumbnail')) {
                 $data['thumbnail'] = $request->file('thumbnail')->store('games', 'public');
@@ -226,16 +230,30 @@ class AdminCrudController extends Controller
                 $zipPath = $request->file('build_zip')->getPathname();
                 $extractPath = public_path('games/' . $slug);
 
-                if (!is_dir($extractPath)) {
-                    mkdir($extractPath, 0755, true);
+                $gamesDir = public_path('games');
+                if (!is_dir($gamesDir)) {
+                    mkdir($gamesDir, 0755, true);
                 }
 
+                if (is_dir($extractPath)) {
+                    $this->rmdirRecursive($extractPath);
+                }
+                mkdir($extractPath, 0755, true);
+
                 $zip = new \ZipArchive;
-                if ($zip->open($zipPath) === true) {
+                $res = $zip->open($zipPath);
+                if ($res === true) {
                     $zip->extractTo($extractPath);
                     $zip->close();
                 } else {
-                    return back()->withErrors(['build_zip' => 'Failed to extract ZIP file'])->withInput();
+                    $errors = [
+                        \ZipArchive::ER_NOZIP => 'Not a valid ZIP file.',
+                        \ZipArchive::ER_OPEN => 'Could not open the ZIP file.',
+                        \ZipArchive::ER_READ => 'Read error while reading the ZIP file.',
+                        \ZipArchive::ER_MEMORY => 'Memory allocation failure.',
+                    ];
+                    $msg = $errors[$res] ?? 'Failed to extract ZIP file (code: ' . $res . ').';
+                    return back()->withErrors(['build_zip' => $msg])->withInput();
                 }
 
                 if (!file_exists($extractPath . '/index.html')) {
