@@ -224,8 +224,19 @@ class AdminCrudController extends Controller
 
             if ($request->hasFile('build_zip')) {
                 $zipPath = $request->file('build_zip')->getPathname();
-                $extractPath = public_path('games/' . $game->slug);
-                $this->extractZip($zipPath, $extractPath);
+                $extractPath = public_path('games/' . $slug);
+
+                if (!is_dir($extractPath)) {
+                    mkdir($extractPath, 0755, true);
+                }
+
+                $zip = new \ZipArchive;
+                if ($zip->open($zipPath) === true) {
+                    $zip->extractTo($extractPath);
+                    $zip->close();
+                } else {
+                    return back()->withErrors(['build_zip' => 'Failed to extract ZIP file'])->withInput();
+                }
 
                 if (!file_exists($extractPath . '/index.html')) {
                     $this->rmdirRecursive($extractPath);
@@ -262,43 +273,6 @@ class AdminCrudController extends Controller
         } catch (\Exception $e) {
             Log::error('Game delete failed', ['error' => $e->getMessage()]);
             return back()->withErrors(['error' => 'Failed to delete game: ' . $e->getMessage()]);
-        }
-    }
-
-    private function extractZip(string $zipPath, string $destination): void
-    {
-        if (!is_dir($destination)) {
-            if (!mkdir($destination, 0755, true) && !is_dir($destination)) {
-                throw new \RuntimeException('Failed to create extraction directory: ' . $destination);
-            }
-        }
-
-        if (class_exists('ZipArchive')) {
-            $zip = new \ZipArchive();
-            $res = $zip->open($zipPath);
-            if ($res !== true) {
-                throw new \RuntimeException('Failed to open ZIP file (code: ' . $res . ')');
-            }
-            if (!$zip->extractTo($destination)) {
-                $zip->close();
-                throw new \RuntimeException('Failed to extract ZIP file.');
-            }
-            $zip->close();
-        } elseif (class_exists('PharData')) {
-            try {
-                $phar = new \PharData($zipPath);
-                $phar->extractTo($destination, null, true);
-            } catch (\Exception $e) {
-                throw new \RuntimeException('PharData extraction failed: ' . $e->getMessage());
-            }
-        } else {
-            $escapedZip = str_replace("'", "''", $zipPath);
-            $escapedDest = str_replace("'", "''", $destination);
-            $command = "powershell -Command \"Expand-Archive -Path '$escapedZip' -DestinationPath '$escapedDest' -Force\"";
-            exec($command . ' 2>&1', $output, $exitCode);
-            if ($exitCode !== 0) {
-                throw new \RuntimeException('ZIP extraction failed: ' . implode("\n", $output));
-            }
         }
     }
 
