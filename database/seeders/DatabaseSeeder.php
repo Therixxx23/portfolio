@@ -57,6 +57,7 @@ class DatabaseSeeder extends Seeder
 
         Game::create([
             'title' => 'Sample Unity Game',
+            'slug' => 'sample-unity-game',
             'description' => 'A Unity WebGL game demo.',
             'path' => '/games/sample-game/index.html',
             'category' => 'unity',

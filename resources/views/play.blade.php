@@ -16,7 +16,7 @@
     @else
         <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.5rem;">
             @foreach ($games as $game)
-                <a href="{{ route('play.show', $game) }}" class="game-card animate-on-scroll" style="text-decoration:none;display:flex;flex-direction:column;">
+                <a href="{{ route('play.show', ['game' => $game->slug]) }}" class="game-card animate-on-scroll" style="text-decoration:none;display:flex;flex-direction:column;">
                     <div class="game-card-thumb">
                         @if ($game->thumbnail)
                             <img src="{{ Storage::url($game->thumbnail) }}" alt="{{ $game->title }}" loading="lazy" style="width:100%;height:100%;object-fit:cover;">
