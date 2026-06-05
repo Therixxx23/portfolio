@@ -25,7 +25,7 @@
             <div class="liquid-blob" style="width:80px;height:80px;background:linear-gradient(135deg,#00D4FF,#0066FF);margin-bottom:1.5rem;position:relative;"></div>
             <p style="color:#8B9CBD;font-family:'JetBrains Mono',monospace;font-size:0.875rem;" id="loaderText">Loading {{ $game->title }}...</p>
         </div>
-        <iframe id="gameIframe" src="{{ $game->path }}" style="display:none;width:100%;height:100%;border:none;" sandbox="allow-scripts allow-same-origin allow-popups allow-pointer-lock" allowfullscreen></iframe>
+        <iframe id="gameIframe" src="{{ $game->iframe_url ?? $game->path }}" style="display:none;width:100%;height:100%;border:none;" sandbox="allow-scripts allow-same-origin allow-popups allow-pointer-lock" allowfullscreen></iframe>
     </div>
 </section>
 

@@ -78,12 +78,9 @@
             </div>
 
             <div style="margin-bottom:1.5rem;">
-                <label for="build_zip" style="display:block;font-size:0.8rem;color:#8B9CBD;margin-bottom:0.4rem;">Unity WebGL Build (ZIP)</label>
-                @if (isset($game))
-                    <p style="color:#8B9CBD;font-size:0.8rem;margin-bottom:0.5rem;">Current path: <span style="font-family:'JetBrains Mono',monospace;color:#4A5568;">{{ $game->path }}</span></p>
-                @endif
-                <input type="file" id="build_zip" name="build_zip" class="form-input" style="padding:0.5rem;" accept=".zip">
-                <p style="color:#4A5568;font-size:0.75rem;margin-top:0.3rem;">Upload a ZIP file containing your Unity WebGL build. Must include <span style="font-family:'JetBrains Mono',monospace;">index.html</span> at the root. Max 50MB.</p>
+                <label for="iframe_url" style="display:block;font-size:0.8rem;color:#8B9CBD;margin-bottom:0.4rem;">Game URL (iframe)</label>
+                <input type="url" id="iframe_url" name="iframe_url" class="form-input" value="{{ old('iframe_url', $game->iframe_url ?? '') }}" placeholder="https://itch.io/embed/1234567">
+                <p style="color:#4A5568;font-size:0.75rem;margin-top:0.3rem;">Paste the embed URL from itch.io or any external game hosting platform. The game will load in an iframe.</p>
             </div>
 
             <div style="display:flex;gap:0.75rem;">

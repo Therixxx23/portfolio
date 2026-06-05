@@ -59,7 +59,7 @@ class DatabaseSeeder extends Seeder
             'title' => 'Sample Unity Game',
             'slug' => 'sample-unity-game',
             'description' => 'A Unity WebGL game demo.',
-            'path' => '/games/sample-game/index.html',
+            'iframe_url' => 'https://itch.io/embed/1234567',
             'category' => 'unity',
             'sort_order' => 1,
         ]);
