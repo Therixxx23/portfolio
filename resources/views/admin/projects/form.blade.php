@@ -44,13 +44,14 @@
             <div style="margin-bottom:1.25rem;">
                 <label for="category" style="display:block;font-size:0.8rem;color:#8B9CBD;margin-bottom:0.4rem;">Category <span style="color:#FF4466;">*</span></label>
                 <select id="category" name="category" class="form-input" required>
-                    <option value="unity" {{ (old('category', $project->category ?? '') == 'unity') ? 'selected' : '' }}>Unity</option>
+                    <option value="unity" {{ (old('category', $project->category ?? '') == 'unity') ? 'selected' : '' }}>Unity Game</option>
                     <option value="web" {{ (old('category', $project->category ?? '') == 'web') ? 'selected' : '' }}>Web</option>
+                    <option value="design" {{ (old('category', $project->category ?? '') == 'design') ? 'selected' : '' }}>Design</option>
                 </select>
             </div>
             <div style="margin-bottom:1.25rem;">
                 <label for="tech_stack" style="display:block;font-size:0.8rem;color:#8B9CBD;margin-bottom:0.4rem;">Tech Stack</label>
-                <input type="text" id="tech_stack" name="tech_stack" class="form-input" value="{{ old('tech_stack', $project->tech_stack ?? '') }}" placeholder="Laravel, Tailwind, JavaScript">
+                <input type="text" id="tech_stack" name="tech_stack" class="form-input" value="{{ old('tech_stack', is_array($project->tech_stack ?? null) ? implode(', ', $project->tech_stack) : ($project->tech_stack ?? '') ) }}" placeholder="Laravel, Tailwind, JavaScript">
                 <p style="color:#4A5568;font-size:0.75rem;margin-top:0.3rem;">Comma-separated, e.g. Laravel, Tailwind, JavaScript</p>
             </div>
             <div style="margin-bottom:1.25rem;">
@@ -61,7 +62,16 @@
                 <label for="repo_url" style="display:block;font-size:0.8rem;color:#8B9CBD;margin-bottom:0.4rem;">Repository URL</label>
                 <input type="url" id="repo_url" name="repo_url" class="form-input" value="{{ old('repo_url', $project->repo_url ?? '') }}" placeholder="https://">
             </div>
-            <div style="margin-bottom:1.5rem;">
+            <div style="margin-bottom:1.25rem;">
+                <label for="external_link" style="display:block;font-size:0.8rem;color:#8B9CBD;margin-bottom:0.4rem;">External Link</label>
+                <input type="url" id="external_link" name="external_link" class="form-input" value="{{ old('external_link', $project->external_link ?? '') }}" placeholder="https://instagram.com/p/...">
+                <p style="color:#4A5568;font-size:0.75rem;margin-top:0.3rem;">Instagram post link or any external URL for design projects.</p>
+            </div>
+            <div style="margin-bottom:1.25rem;">
+                <label for="link_label" style="display:block;font-size:0.8rem;color:#8B9CBD;margin-bottom:0.4rem;">Link Label</label>
+                <input type="text" id="link_label" name="link_label" class="form-input" value="{{ old('link_label', $project->link_label ?? '') }}" placeholder="View on Instagram">
+            </div>
+            <div style="margin-bottom:1.25rem;">
                 <label for="thumbnail" style="display:block;font-size:0.8rem;color:#8B9CBD;margin-bottom:0.4rem;">Thumbnail</label>
                 @if (isset($project) && $project->thumbnail)
                     <div style="margin-bottom:0.75rem;">
@@ -69,6 +79,18 @@
                     </div>
                 @endif
                 <input type="file" id="thumbnail" name="thumbnail" class="form-input" style="padding:0.5rem;" accept="image/*">
+            </div>
+            <div style="margin-bottom:1.5rem;">
+                <label for="image_gallery" style="display:block;font-size:0.8rem;color:#8B9CBD;margin-bottom:0.4rem;">Image Gallery (for Design projects)</label>
+                @if (isset($project) && $project->image_gallery)
+                    <div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:0.75rem;">
+                        @foreach ($project->image_gallery as $img)
+                            <img src="{{ Storage::url($img) }}" alt="" style="width:80px;height:60px;object-fit:cover;border-radius:0.375rem;border:1px solid rgba(255,255,255,0.08);">
+                        @endforeach
+                    </div>
+                @endif
+                <input type="file" id="image_gallery" name="image_gallery[]" class="form-input" style="padding:0.5rem;" accept="image/*" multiple>
+                <p style="color:#4A5568;font-size:0.75rem;margin-top:0.3rem;">Upload multiple images for a collage/gallery. Works best with Design category.</p>
             </div>
             <div style="display:flex;gap:0.75rem;">
                 <button type="submit" class="btn-primary">Save</button>

@@ -123,17 +123,31 @@ class AdminCrudController extends Controller
     public function saveProject(Request $request, ?Project $project = null)
     {
         $data = $request->validate([
-            'title'       => 'required',
-            'description' => 'nullable',
-            'category'    => 'required|in:unity,web',
-            'tech_stack'  => 'nullable|string',
-            'demo_url'    => 'nullable|url',
-            'repo_url'    => 'nullable|url',
-            'thumbnail'   => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
+            'title'         => 'required',
+            'description'   => 'nullable',
+            'category'      => 'required|in:unity,web,design',
+            'tech_stack'    => 'nullable|string',
+            'demo_url'      => 'nullable|url',
+            'repo_url'      => 'nullable|url',
+            'external_link' => 'nullable|url|max:1000',
+            'link_label'    => 'nullable|string|max:255',
+            'thumbnail'     => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
+            'image_gallery' => 'nullable|array',
+            'image_gallery.*' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
         ]);
 
         if ($request->hasFile('thumbnail')) {
             $data['thumbnail'] = $request->file('thumbnail')->store('projects', 'public');
+        }
+
+        if ($request->hasFile('image_gallery')) {
+            $paths = [];
+            foreach ($request->file('image_gallery') as $image) {
+                if ($image->isValid()) {
+                    $paths[] = $image->store('projects/gallery', 'public');
+                }
+            }
+            $data['image_gallery'] = $paths;
         }
 
         if (isset($data['tech_stack']) && is_string($data['tech_stack'])) {
