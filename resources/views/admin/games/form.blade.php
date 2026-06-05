@@ -78,9 +78,9 @@
             </div>
 
             <div style="margin-bottom:1.5rem;">
-                <label for="iframe_url" style="display:block;font-size:0.8rem;color:#8B9CBD;margin-bottom:0.4rem;">Game URL (iframe)</label>
-                <input type="url" id="iframe_url" name="iframe_url" class="form-input" value="{{ old('iframe_url', $game->iframe_url ?? '') }}" placeholder="https://itch.io/embed/1234567">
-                <p style="color:#4A5568;font-size:0.75rem;margin-top:0.3rem;">Paste the embed URL from itch.io or any external game hosting platform. The game will load in an iframe.</p>
+                <label for="iframe_url" style="display:block;font-size:0.8rem;color:#8B9CBD;margin-bottom:0.4rem;">itch.io Embed URL</label>
+                <input type="url" id="iframe_url" name="iframe_url" class="form-input" value="{{ old('iframe_url', $game->iframe_url ?? '') }}" placeholder="https://itch.io/embed-upload/12345678">
+                <p style="color:#4A5568;font-size:0.75rem;margin-top:0.3rem;">Get from itch.io dashboard → Edit Game → Embed options → "Embed URL". Format: <span style="font-family:'JetBrains Mono',monospace;color:#8B9CBD;">https://itch.io/embed-upload/XXXXXXX</span></p>
             </div>
 
             <div style="display:flex;gap:0.75rem;">
