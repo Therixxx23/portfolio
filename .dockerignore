@@ -1,0 +1,34 @@
+# VCS
+.git
+.gitattributes
+.gitignore
+
+# Env files (secrets — never copied into the image)
+.env
+.env.backup
+.env.production
+
+# Dependencies (rebuilt inside the image)
+node_modules
+vendor
+
+# Frontend build output (regenerated in stage 1)
+public/build
+public/hot
+public/storage
+
+# Laravel runtime data (created + chowned in the image)
+storage/logs/*
+storage/framework/cache/*
+storage/framework/sessions/*
+storage/framework/testing/*
+storage/framework/views/*
+bootstrap/cache/*
+!bootstrap/cache/.gitignore
+
+# Local tooling
+.idea
+.vscode
+*.log
+push.sh
+DOKKU_DEPLOY.md
